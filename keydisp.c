@@ -98,12 +98,6 @@ int main()
 		x = memread(gpio_baseaddr, GPIO_GPLEV0);
 		status1 = (x >> 22) & 1;
 		status_red1 = (x >> 23) & 1;
-		if (check == 1 && action_tea == 1)
-		{
-			clear(i2c_fd);
-			check = 0;
-			action_tea = 0;
-		}
 		if (status == 1 && status1 == 0)
 		{
 			location(i2c_fd, 0);
@@ -119,14 +113,6 @@ int main()
 		else if (status == 0 && status1 == 1)
 		{
 			setitimer(ITIMER_REAL, &timval, NULL);
-		}
-		status = status1;
-		if (check == 1 && action_red == 1)
-		{
-			location(i2c_fd, 1);
-			clear(i2c_fd);
-			check = 0;
-			action_red = 0;
 		}
 		if (status_red == 1 && status_red1 == 0)
 		{
@@ -144,6 +130,25 @@ int main()
 		{
 			setitimer(ITIMER_REAL, &timval_red, NULL);
 		}
+		if (check == 1 && action_red == 1)
+		{
+			location(i2c_fd, 1);
+			lcd_datawrite(i2c_fd,"       ");
+			if (action_tea != 1)
+				check = 0;
+			action_red = 0;
+		}
+
+		if (check == 1 && action_tea == 1)
+		{
+			location(i2c_fd, 0);
+			lcd_datawrite(i2c_fd,"        ");
+			if (action_red != 1)
+				check = 0;
+			action_tea = 0;
+		}
+		status = status1;
+		status_red = status_red1;
 
 	}
 }	
